@@ -1,6 +1,16 @@
 import Link from '@material-ui/core/Link';
 import * as React from "react";
-import { Create, Datagrid, List, SimpleForm, TextField, TextInput, useRecordContext } from 'react-admin';
+import { Create, Datagrid, List, SimpleForm, TextField, TextInput, useRecordContext,
+    required,
+    minLength,
+    maxLength,
+    minValue,
+    maxValue,
+    number,
+    regex,
+    email,
+    choices,
+} from 'react-admin';
 import { BulkActionButtons, DefaultToolbarWithoutDeleteButton } from "./utilComponents";
 
 const CustomLink = (props) => {
@@ -18,10 +28,21 @@ export const SubjectList = props => (
     </List>
 );
 
+const validateName = [
+    required(),
+    minLength(1),
+    maxLength(50),
+    (value, allValues) => {
+        if (!(value + '').trim()) {
+            return 'Required';
+        }
+        return undefined;
+    }];
+
 export const SubjectCreate = props => (
     <Create {...props}>
         <SimpleForm toolbar={<DefaultToolbarWithoutDeleteButton />} warnWhenUnsavedChanges margin="normal" variant="standard">
-            <TextInput source="name" />
+            <TextInput source="name" label="Subject name" validate={validateName} />
         </SimpleForm>
     </Create>
 );

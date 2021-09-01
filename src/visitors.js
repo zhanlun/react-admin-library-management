@@ -1,5 +1,16 @@
 import * as React from "react";
-import { Create, Datagrid, Edit, EditButton, List, SimpleForm, TextField, TextInput, useNotify, useRedirect, useRefresh } from 'react-admin';
+import {
+    Create, Datagrid, Edit, EditButton, List, SimpleForm, TextField, TextInput, useNotify, useRedirect, useRefresh,
+    required,
+    minLength,
+    maxLength,
+    minValue,
+    maxValue,
+    number,
+    regex,
+    email,
+    choices,
+} from 'react-admin';
 import { BulkActionButtons, DefaultToolbarWithoutDeleteButton } from "./utilComponents";
 
 
@@ -16,6 +27,17 @@ export const VisitorList = props => (
     </List>
 );
 
+const validateName = [
+    required(),
+    minLength(1),
+    maxLength(50),
+    (value, allValues) => {
+        if (!(value + '').trim()) {
+            return 'Required';
+        }
+        return undefined;
+    }];
+
 export const VisitorEdit = props => {
     const notify = useNotify();
     const refresh = useRefresh();
@@ -27,14 +49,15 @@ export const VisitorEdit = props => {
         refresh();
     };
     return (
-    <Edit onSuccess={onSuccess} {...props}>
+        <Edit onSuccess={onSuccess} mutationMode="pessimistic" {...props}>
             <SimpleForm toolbar={<DefaultToolbarWithoutDeleteButton />} warnWhenUnsavedChanges margin="normal" variant="standard">
-            <TextInput disabled source="id" />
-            <TextInput source="firstName" />
-            <TextInput source="lastName" />
-        </SimpleForm>
-    </Edit>
-)};
+                <TextInput disabled source="id" />
+                <TextInput source="firstName" validate={validateName} />
+                <TextInput source="lastName" validate={validateName} />
+            </SimpleForm>
+        </Edit>
+    )
+};
 
 export const VisitorCreate = props => {
     const notify = useNotify();
@@ -47,10 +70,11 @@ export const VisitorCreate = props => {
         refresh();
     };
     return (
-    <Create onSuccess={onSuccess} {...props}>
+        <Create onSuccess={onSuccess} {...props}>
             <SimpleForm toolbar={<DefaultToolbarWithoutDeleteButton />} warnWhenUnsavedChanges margin="normal" variant="standard">
-            <TextInput source="firstName" />
-            <TextInput source="lastName" />
-        </SimpleForm>
-    </Create>
-)};
+                <TextInput source="firstName" validate={validateName} />
+                <TextInput source="lastName" validate={validateName} />
+            </SimpleForm>
+        </Create>
+    )
+};

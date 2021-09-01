@@ -1,5 +1,16 @@
 import * as React from "react";
-import { ChipField, Create, Datagrid, Edit, EditButton, ImageField, List, NumberField, NumberInput, ReferenceField, ReferenceInput, SelectInput, Show, SimpleForm, SimpleShowLayout, TextField, TextInput } from 'react-admin';
+import {
+    ChipField, Create, Datagrid, Edit, EditButton, ImageField, List, NumberField, NumberInput, ReferenceField, ReferenceInput, SelectInput, Show, SimpleForm, SimpleShowLayout, TextField, TextInput,
+    required,
+    minLength,
+    maxLength,
+    minValue,
+    maxValue,
+    number,
+    regex,
+    email,
+    choices,
+} from 'react-admin';
 import { BulkActionButtons, DefaultToolbarWithoutDeleteButton } from "./utilComponents";
 
 
@@ -53,21 +64,34 @@ export const BookShow = props => (
     </Show>
 );
 
+const notEmptyStringValidator = (value, allValues) => {
+    if (!(value + '').trim()) {
+        return 'Required';
+    }
+    return undefined;
+};
+
+const validateTitle = [required(), minLength(1), maxLength(255), notEmptyStringValidator];
+const validateString = [required(), minLength(1), maxLength(1000), notEmptyStringValidator];
+const validateSummary = [required(), minLength(1), maxLength(100000), notEmptyStringValidator];
+const validateId = [required(), notEmptyStringValidator()]
+const validateNumber = [required(), number(), minValue(0), maxValue(9999)];
+
 export const BookEdit = props => {
     return (
-        <Edit {...props}>
+        <Edit {...props} mutationMode="pessimistic" >
             <SimpleForm toolbar={<DefaultToolbarWithoutDeleteButton />} warnWhenUnsavedChanges margin="normal" variant="standard">
                 <TextInput disabled source="id" />
-                <TextInput source="name" label="Title" fullWidth />
-                <ReferenceInput label="Subject" source="subject.id" reference="subjects" >
+                <TextInput source="name" label="Title" fullWidth validate={validateTitle} />
+                <ReferenceInput label="Subject" source="subject.id" reference="subjects" validate={validateId}>
                     <SelectInput optionText="name" />
                 </ReferenceInput>
-                <TextInput source="publisher" />
-                <NumberInput source="publishedYear" min={0} max={9999} />
-                <TextInput source="contributors" fullWidth />
-                <TextInput multiline source="summary" fullWidth />
-                <TextInput source="coverImagePath" label="Cover Image Link" fullWidth />
-                <NumberInput source="numberOfCopy" min={0} />
+                <TextInput source="publisher" validate={validateString} />
+                <NumberInput source="publishedYear" min={0} max={9999} validate={validateNumber} />
+                <TextInput source="contributors" fullWidth validate={validateString} />
+                <TextInput multiline source="summary" fullWidth validate={validateSummary} />
+                <TextInput source="coverImagePath" label="Cover Image Link" fullWidth validate={validateString} />
+                <NumberInput source="numberOfCopy" min={0} max={9999} validate={validateNumber} />
             </SimpleForm>
         </Edit>
     )
@@ -77,16 +101,16 @@ export const BookCreate = props => {
     return (
         <Create {...props}>
             <SimpleForm toolbar={<DefaultToolbarWithoutDeleteButton />} warnWhenUnsavedChanges margin="normal" variant="standard">
-                <TextInput source="name" label="Title" fullWidth />
-                <ReferenceInput label="Subject" source="subject.id" reference="subjects" >
+                <TextInput source="name" label="Title" fullWidth validate={validateTitle} />
+                <ReferenceInput label="Subject" source="subject.id" reference="subjects" validate={validateId}>
                     <SelectInput optionText="name" />
                 </ReferenceInput>
-                <TextInput source="publisher" />
-                <NumberInput source="publishedYear" min={0} max={9999} />
-                <TextInput source="contributors" fullWidth />
-                <TextInput multiline source="summary" fullWidth />
-                <TextInput source="coverImagePath" label="Cover Image Link" fullWidth />
-                <NumberInput source="numberOfCopy" min={0} />
+                <TextInput source="publisher" validate={validateString} />
+                <NumberInput source="publishedYear" min={0} max={9999} validate={validateNumber} />
+                <TextInput source="contributors" fullWidth validate={validateString} />
+                <TextInput multiline source="summary" fullWidth validate={validateSummary} />
+                <TextInput source="coverImagePath" label="Cover Image Link" fullWidth validate={validateString} />
+                <NumberInput source="numberOfCopy" min={0} max={9999} validate={validateNumber} />
             </SimpleForm>
         </Create>
     )

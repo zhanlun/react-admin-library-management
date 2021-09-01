@@ -1,5 +1,19 @@
 import * as React from "react";
-import { AutocompleteInput, Create, Datagrid, DateField, DateTimeInput, Edit, EditButton, FunctionField, List, NumberInput, ReferenceField, ReferenceInput, SimpleForm, TextField, TextInput, useNotify, useRedirect, useRefresh } from 'react-admin';
+import { useCallback } from 'react';
+
+import {
+    AutocompleteInput, Create, Datagrid, DateField, DateTimeInput, Edit, EditButton, FunctionField, List, NumberInput, ReferenceField, ReferenceInput, SimpleForm, TextField, TextInput, useNotify, useRedirect, useRefresh,
+    required,
+    minLength,
+    maxLength,
+    minValue,
+    maxValue,
+    number,
+    regex,
+    email,
+    choices,
+    useMutation,
+} from 'react-admin';
 import { BulkActionButtons, DefaultToolbarWithoutDeleteButton } from "./utilComponents";
 
 
@@ -21,9 +35,9 @@ export const CheckoutList = props => (
                 <TextField source="name" />
             </ReferenceField>
 
-            <ReferenceField 
-                label="Visitor" 
-                link={(record, reference) => `/checkouts?filter=` + encodeURI(JSON.stringify({ visitor: { id: record.visitor.id}} ))} 
+            <ReferenceField
+                label="Visitor"
+                link={(record, reference) => `/checkouts?filter=` + encodeURI(JSON.stringify({ visitor: { id: record.visitor.id } }))}
                 source="visitor.id" reference="visitors">
                 <FunctionField
                     label="Visitor Name"
@@ -39,6 +53,16 @@ export const CheckoutList = props => (
     </List>
 );
 
+const notEmptyStringValidator = (value, allValues) => {
+    if (!(value + '').trim()) {
+        return 'Required';
+    }
+    return undefined;
+};
+
+const validateTitle = [required(), minLength(1), maxLength(255), notEmptyStringValidator];
+const validateId = [required(), notEmptyStringValidator()]
+
 export const CheckoutEdit = props => {
     const notify = useNotify();
     const refresh = useRefresh();
@@ -50,26 +74,27 @@ export const CheckoutEdit = props => {
         refresh();
     };
     return (
-    <Edit onSuccess={onSuccess} {...props}>
-        <SimpleForm toolbar={<DefaultToolbarWithoutDeleteButton />} warnWhenUnsavedChanges margin="normal" variant="standard">
-            <TextInput disabled source="id" />
+        <Edit onSuccess={onSuccess} {...props} mutationMode="pessimistic" >
+            <SimpleForm  toolbar={<DefaultToolbarWithoutDeleteButton />} warnWhenUnsavedChanges margin="normal" variant="standard">
+                <TextInput disabled source="id" />
 
-            <ReferenceInput label="Visitor Name" source="visitor.id" reference="visitors" fullWidth filterToQuery={searchText => ({ name: searchText })}>
-                <AutocompleteInput optionText={(visitor) => `${visitor.firstName || ''} ${visitor.lastName || ''}`} resettable />
-            </ReferenceInput>
-            <NumberInput disabled source="visitor.id" label="Visitor Id" />
+                <ReferenceInput label="Visitor Name" source="visitor.id" reference="visitors" fullWidth filterToQuery={searchText => ({ name: searchText })} validate={validateId}>
+                    <AutocompleteInput optionText={(visitor) => `${visitor.firstName || ''} ${visitor.lastName || ''}`} resettable />
+                </ReferenceInput>
+                <NumberInput disabled source="visitor.id" label="Visitor Id" />
 
-            <ReferenceInput label="Book Title" source="book.id" reference="books" fullWidth filterToQuery={searchText => ({ name: searchText })}>
-                <AutocompleteInput source="name" resettable />
-            </ReferenceInput>
-            <NumberInput disabled source="book.id" label="Book Id" />
+                <ReferenceInput label="Book Title" source="book.id" reference="books" fullWidth filterToQuery={searchText => ({ name: searchText })} validate={validateId}>
+                    <AutocompleteInput source="name" resettable />
+                </ReferenceInput>
+                <NumberInput disabled source="book.id" label="Book Id" />
 
-            <DateField showTime source="checkoutDate" />
-            <DateField showTime source="dueDate" />
-            <DateTimeInput source="returnDate" initialValue={new Date()} />
-        </SimpleForm>
-    </Edit>
-)};
+                <DateField showTime source="checkoutDate" />
+                <DateField showTime source="dueDate" />
+                <DateTimeInput source="returnDate" initialValue={new Date()} validate={validateId} />
+            </SimpleForm>
+        </Edit>
+    )
+};
 
 export const CheckoutCreate = props => {
     const notify = useNotify();
@@ -86,18 +111,18 @@ export const CheckoutCreate = props => {
         <Create onSuccess={onSuccess} {...props}>
             <SimpleForm toolbar={<DefaultToolbarWithoutDeleteButton />} warnWhenUnsavedChanges margin="normal" variant="standard">
 
-                <ReferenceInput label="Visitor Name" source="visitor.id" reference="visitors" fullWidth filterToQuery={searchText => ({ name: searchText })}>
+                <ReferenceInput label="Visitor Name" source="visitor.id" reference="visitors" fullWidth filterToQuery={searchText => ({ name: searchText })} validate={validateId}>
                     <AutocompleteInput optionText={(visitor) => `${visitor.firstName || ''} ${visitor.lastName || ''}`} resettable />
                 </ReferenceInput>
                 <NumberInput disabled source="visitor.id" label="Visitor Id" />
 
-                <ReferenceInput label="Book Title" source="book.id" reference="books" fullWidth filterToQuery={searchText => ({ name: searchText })}>
+                <ReferenceInput label="Book Title" source="book.id" reference="books" fullWidth filterToQuery={searchText => ({ name: searchText })} validate={validateId}>
                     <AutocompleteInput source="name" resettable />
                 </ReferenceInput>
                 <NumberInput disabled source="book.id" label="Book Id" />
 
-                <DateTimeInput showTime source="checkoutDate" label="Checkout Date" initialValue={new Date()} />
-                <DateTimeInput showTime source="dueDate" label="Due Date" initialValue={assignDueDate(new Date(), 30)} />
+                <DateTimeInput showTime source="checkoutDate" label="Checkout Date" initialValue={new Date()} validate={validateTitle} />
+                <DateTimeInput showTime source="dueDate" label="Due Date" initialValue={assignDueDate(new Date(), 30)} validate={validateTitle} />
             </SimpleForm>
         </Create>
     )
