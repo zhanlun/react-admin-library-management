@@ -1,17 +1,8 @@
 import * as React from "react";
 import {
-    ChipField, Create, Datagrid, Edit, EditButton, ImageField, List, NumberField, NumberInput, ReferenceField, ReferenceInput, SelectInput, Show, SimpleForm, SimpleShowLayout, TextField, TextInput,
-    required,
-    minLength,
-    maxLength,
-    minValue,
-    maxValue,
-    number,
-    regex,
-    email,
-    choices,
+    ChipField, Create, Datagrid, Edit, EditButton, FunctionField, ImageField, List, maxLength, maxValue, minLength, minValue, number, NumberField, NumberInput, ReferenceField, ReferenceInput, required, SelectInput, Show, SimpleForm, SimpleShowLayout, TextField, TextInput
 } from 'react-admin';
-import { BulkActionButtons, DefaultToolbarWithoutDeleteButton } from "./utilComponents";
+import { DefaultToolbarWithoutDeleteButton } from "./utilComponents";
 
 
 const bookFilters = [
@@ -23,7 +14,7 @@ const bookFilters = [
 
 export const BookList = props => {
     return (
-        <List {...props} filters={bookFilters} bulkActionButtons={<BulkActionButtons />} perPage={5}>
+        <List {...props} filters={bookFilters} bulkActionButtons={false} perPage={5}>
             <Datagrid rowClick="show">
                 <TextField source="id" />
                 <TextField source="name" />
@@ -37,7 +28,9 @@ export const BookList = props => {
                 <TextField source="publishedYear" />
                 <TextField source="contributors" />
                 <ImageField source="coverImagePath" />
-                <NumberField source="numberOfCopy" />
+                <FunctionField  label="Number of Copies"
+                    render={book=> `${book.availableCopy} / ${book.numberOfCopy}`}
+                    />
                 <EditButton />
             </Datagrid>
         </List>

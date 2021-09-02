@@ -1,20 +1,9 @@
 import * as React from "react";
-import { useCallback } from 'react';
-
 import {
-    AutocompleteInput, Create, Datagrid, DateField, DateTimeInput, Edit, EditButton, FunctionField, List, NumberInput, ReferenceField, ReferenceInput, SimpleForm, TextField, TextInput, useNotify, useRedirect, useRefresh,
-    required,
-    minLength,
-    maxLength,
-    minValue,
-    maxValue,
-    number,
-    regex,
-    email,
-    choices,
-    useMutation,
+    AutocompleteInput, Create, Datagrid, DateField, DateTimeInput, Edit, EditButton, FunctionField, List, maxLength, minLength, NumberField, NumberInput, ReferenceField, ReferenceInput, required, SimpleForm, TextField, TextInput, useNotify, useRedirect, useRefresh
 } from 'react-admin';
-import { BulkActionButtons, DefaultToolbarWithoutDeleteButton } from "./utilComponents";
+import { DefaultToolbarWithoutDeleteButton } from "./utilComponents";
+
 
 
 
@@ -28,7 +17,7 @@ const checkoutFilters = [
 ];
 
 export const CheckoutList = props => (
-    <List {...props} filters={checkoutFilters} bulkActionButtons={<BulkActionButtons />}>
+    <List {...props} filters={checkoutFilters} bulkActionButtons={false}>
         <Datagrid>
             <TextField source="id" />
             <ReferenceField link="show" label="Book Title" source="book.id" reference="books">
@@ -48,10 +37,14 @@ export const CheckoutList = props => (
             <DateField source="checkoutDate" label="Checkout Date" showTime />
             <DateField source="dueDate" label="Due Date" showTime />
             <DateField source="returnDate" label="Return Date" showTime />
-            <EditButton />
+            <ReturnButtonWrapper />
         </Datagrid>
     </List>
 );
+
+const ReturnButtonWrapper = (props) => {
+    return !props.record.returnDate && <EditButton label="Return" basePath="checkouts" record={props.record} />
+}
 
 const notEmptyStringValidator = (value, allValues) => {
     if (!(value + '').trim()) {
@@ -75,18 +68,14 @@ export const CheckoutEdit = props => {
     };
     return (
         <Edit onSuccess={onSuccess} {...props} mutationMode="pessimistic" >
-            <SimpleForm  toolbar={<DefaultToolbarWithoutDeleteButton />} warnWhenUnsavedChanges margin="normal" variant="standard">
+            <SimpleForm toolbar={<DefaultToolbarWithoutDeleteButton />} warnWhenUnsavedChanges margin="normal" variant="standard">
                 <TextInput disabled source="id" />
 
-                <ReferenceInput label="Visitor Name" source="visitor.id" reference="visitors" fullWidth filterToQuery={searchText => ({ name: searchText })} validate={validateId}>
-                    <AutocompleteInput optionText={(visitor) => `${visitor.firstName || ''} ${visitor.lastName || ''}`} resettable />
-                </ReferenceInput>
-                <NumberInput disabled source="visitor.id" label="Visitor Id" />
+                <FunctionField render={(record) => `${record.visitor.firstName || ''} ${record.visitor.lastName || ''}`} label="Visitor Name" />
+                <NumberField disabled source="visitor.id" label="Visitor Id" />
 
-                <ReferenceInput label="Book Title" source="book.id" reference="books" fullWidth filterToQuery={searchText => ({ name: searchText })} validate={validateId}>
-                    <AutocompleteInput source="name" resettable />
-                </ReferenceInput>
-                <NumberInput disabled source="book.id" label="Book Id" />
+                <TextField disabled source="book.name" label="Book Title" />
+                <NumberField disabled source="book.id" label="Book Id" />
 
                 <DateField showTime source="checkoutDate" />
                 <DateField showTime source="dueDate" />
@@ -111,12 +100,17 @@ export const CheckoutCreate = props => {
         <Create onSuccess={onSuccess} {...props}>
             <SimpleForm toolbar={<DefaultToolbarWithoutDeleteButton />} warnWhenUnsavedChanges margin="normal" variant="standard">
 
-                <ReferenceInput label="Visitor Name" source="visitor.id" reference="visitors" fullWidth filterToQuery={searchText => ({ name: searchText })} validate={validateId}>
+                <ReferenceInput label="Visitor Name" source="visitor.id" reference="visitors" fullWidth filterToQuery={searchText => ({ name: searchText })} validate={validateId}
+                    sort={{ field: 'firstName' }}
+                >
                     <AutocompleteInput optionText={(visitor) => `${visitor.firstName || ''} ${visitor.lastName || ''}`} resettable />
                 </ReferenceInput>
                 <NumberInput disabled source="visitor.id" label="Visitor Id" />
 
-                <ReferenceInput label="Book Title" source="book.id" reference="books" fullWidth filterToQuery={searchText => ({ name: searchText })} validate={validateId}>
+                <ReferenceInput label="Book Title" source="book.id" reference="books" fullWidth filterToQuery={searchText => ({ name: searchText })} validate={validateId}
+                    sort={{ field: 'name' }}
+                    filter={{ isAvailable: true }}
+                >
                     <AutocompleteInput source="name" resettable />
                 </ReferenceInput>
                 <NumberInput disabled source="book.id" label="Book Id" />

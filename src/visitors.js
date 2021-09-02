@@ -1,23 +1,14 @@
 import * as React from "react";
 import {
-    Create, Datagrid, Edit, EditButton, List, SimpleForm, TextField, TextInput, useNotify, useRedirect, useRefresh,
-    required,
-    minLength,
-    maxLength,
-    minValue,
-    maxValue,
-    number,
-    regex,
-    email,
-    choices,
+    Create, Datagrid, Edit, EditButton, List, maxLength, minLength, required, SimpleForm, TextField, TextInput, useNotify, useRedirect, useRefresh
 } from 'react-admin';
-import { BulkActionButtons, DefaultToolbarWithoutDeleteButton } from "./utilComponents";
+import { DefaultToolbarWithoutDeleteButton } from "./utilComponents";
 
 
 
 
 export const VisitorList = props => (
-    <List {...props} bulkActionButtons={<BulkActionButtons />}>
+    <List {...props} bulkActionButtons={false}>
         <Datagrid>
             <TextField source="id" />
             <TextField source="firstName" />

@@ -1,17 +1,7 @@
 import Link from '@material-ui/core/Link';
 import * as React from "react";
-import { Create, Datagrid, List, SimpleForm, TextField, TextInput, useRecordContext,
-    required,
-    minLength,
-    maxLength,
-    minValue,
-    maxValue,
-    number,
-    regex,
-    email,
-    choices,
-} from 'react-admin';
-import { BulkActionButtons, DefaultToolbarWithoutDeleteButton } from "./utilComponents";
+import { Create, Datagrid, List, maxLength, minLength, required, SimpleForm, TextField, TextInput, useRecordContext } from 'react-admin';
+import { DefaultToolbarWithoutDeleteButton } from "./utilComponents";
 
 const CustomLink = (props) => {
     const { source } = props;
@@ -20,7 +10,7 @@ const CustomLink = (props) => {
 }
 
 export const SubjectList = props => (
-    <List {...props} bulkActionButtons={BulkActionButtons}>
+    <List {...props} bulkActionButtons={false}>
         <Datagrid>
             <TextField source="id" />
             <CustomLink source="name" />
